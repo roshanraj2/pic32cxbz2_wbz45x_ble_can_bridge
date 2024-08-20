@@ -38,10 +38,13 @@
     The "BLE_DM_Init" function shall be called in the "APP_Initialize" function to 
     initialize the this modules in the system.
  *******************************************************************************/
-
+/**@addtogroup BLE_MW BLE Middleware
+ * @brief These modules help communicating with BLE_LIB and provide functions/events for application easy usage.
+ * @{ */
 
 /**
- * @addtogroup BLE_DM
+ * @defgroup BLE_DM BLE Device Mananger Module (BLE_DM)
+ * @brief Performing BLE security procedure and managing paired peer device information
  * @{
  * @brief Header file for the BLE Device Manager (ble_dm) module.
  * @note Definitions and prototypes for the BLE Device Manager application programming interface.
@@ -65,6 +68,14 @@
 #include "gatt.h"
 #include "ble_smp.h"
 
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+extern "C" {
+
+#endif
+// DOM-IGNORE-END
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -75,33 +86,33 @@
  * @{ */
 
 /**@defgroup BLE_DM_MAX_RETISTER_NUM Maximum registration number
- * @brief The definition of maximum number of BLE_DM register
+ * @brief The definition of maximum number of BLE_DM register.
  * @{ */
-#define BLE_DM_MAX_REGISTER_NUM                 2                               /**< Maximum BLE_DM register num. */
+#define BLE_DM_MAX_REGISTER_NUM                 (2U)                               /**< Maximum BLE_DM register num. */
 /** @} */
 
 
 /**@defgroup BLE_DM_MAX_PAIRED_DEVICE_NUM Maximum paired record number
- * @brief The definition of maximum number of paired device store in flash
+ * @brief The definition of maximum number of paired device store in flash.
  * @{ */
-#define BLE_DM_MAX_PAIRED_DEVICE_NUM            8                               /**< Maximum number of paired device store in flash. */
+#define BLE_DM_MAX_PAIRED_DEVICE_NUM            (8U)                               /**< Maximum number of paired device store in flash. */
 /** @} */
 
 
 /**@defgroup BLE_DM_PEER_DEV_ID_INVALID Invalid peer device ID
- * @brief The definition of invalid peer device id
+ * @brief The definition of invalid peer device id.
  * @{ */
 #define BLE_DM_PEER_DEV_ID_INVALID              BLE_DM_MAX_PAIRED_DEVICE_NUM    /**< Definition of invalid peer device id. */
 /** @} */
 
 /**@defgroup BLE_DM_MAX_FILTER_ACCEPT_LIST_NUM Maximum filter accept list num
- * @brief The definition of maximum number of paired devices in the filter accept list
+ * @brief The definition of maximum number of paired devices in the filter accept list.
  * @{ */
 #define BLE_DM_MAX_FILTER_ACCEPT_LIST_NUM       BLE_DM_MAX_PAIRED_DEVICE_NUM                /**< Maximum number of filter accept list. */
 /** @} */
 
 /**@defgroup BLE_DM_MAX_RESOLVING_LIST_NUM Maximum resolving list num
- * @brief The definition of maximum number of paired devices in the resolving list
+ * @brief The definition of maximum number of paired devices in the resolving list.
  * @{ */
 #define BLE_DM_MAX_RESOLVING_LIST_NUM           BLE_DM_MAX_PAIRED_DEVICE_NUM                /**< Maximum number of resolving list. */
 /** @} */
@@ -119,9 +130,9 @@ typedef enum BLE_DM_EventId_T
 {
     BLE_DM_EVT_DISCONNECTED,                    /**< BLE link is terminated. See @ref BLE_DM_Event_T for the event details. */
     BLE_DM_EVT_CONNECTED,                       /**< BLE link is established. See @ref BLE_DM_Event_T for the event details. */
-    BLE_DM_EVT_SECURITY_START,                  /**< Security procedure has started. See @ref BLE_DM_EvtSecurityStart_T. for the event detail */
+    BLE_DM_EVT_SECURITY_START,                  /**< Security procedure has started. See @ref BLE_DM_EvtSecurityStart_T. for the event detail. */
     BLE_DM_EVT_SECURITY_SUCCESS,                /**< Security procedure has finished successfully. See @ref BLE_DM_EvtSecuritySuccess_T. for the event detail */
-    BLE_DM_EVT_SECURITY_FAIL,                   /**< Security procedure has failed. See @ref BLE_DM_EvtSecurityFail_T. for the event detail */
+    BLE_DM_EVT_SECURITY_FAIL,                   /**< Security procedure has failed. See @ref BLE_DM_EvtSecurityFail_T. for the event detail. */
     BLE_DM_EVT_PAIRED_DEVICE_FULL,              /**< The maximum record number of paired device have been reached. DM cannot store the latest bonding data to flash. To solve this problem, delete paired device that is not needed anymore. See the @ref BLE_DM_EvtPairedDeviceFull_T for the event content. */
     BLE_DM_EVT_PAIRED_DEVICE_UPDATED,           /**< A paired device have been updated. Application can use peerDevId get paired device information by @ref BLE_DM_GetPairedDevice. */
     BLE_DM_EVT_CONN_UPDATE_SUCCESS,             /**< Connection parameter update triggered by @ref BLE_DM_ConnectionParameterUpdate is success. See @ref BLE_DM_Event_T for the event details.*/
@@ -158,7 +169,7 @@ typedef struct BLE_DM_EvtSecurityStart_T
 typedef struct BLE_DM_EvtSecuritySuccess_T
 {
     BLE_DM_SecurityProc_T           procedure;              /**< The procedure that has finished successfully. */
-    uint8_t                         bonded;                 /**< The pairing procedure is bonded or not.*/
+    bool                            bonded;                 /**< The pairing procedure is bonded or not. True means it's bonded. */
 } BLE_DM_EvtSecuritySuccess_T;
 
 
@@ -167,7 +178,7 @@ typedef struct BLE_DM_EvtSecurityFail_T
 {
     BLE_DM_SecurityProc_T           procedure;              /**< The procedure that has failed. */
     uint8_t                         error;                  /**< The error for failure occurred. See @ref BLE_SMP_PAIRING_RESULT if procedure is @ref DM_SECURITY_PROC_PAIRING. */
-    uint8_t                         reason;                 /**< The reason for error occurred. See @ref BLE_SMP_PAIRING_FAIL_REASON if error is BLE_SMP_PAIRING_FAIL */
+    uint8_t                         reason;                 /**< The reason for error occurred. See @ref BLE_SMP_PAIRING_FAIL_REASON if error is BLE_SMP_PAIRING_FAIL. */
 } BLE_DM_EvtSecurityFail_T;
 
 
@@ -203,7 +214,7 @@ typedef struct BLE_DM_ConnConfig_T
     uint16_t                        maxAcceptConnInterval;          /**< Maximum acceptable connection interval. */
     uint16_t                        minAcceptPeripheralLatency;     /**< Minimum acceptable Peripheral latency. */
     uint16_t                        maxAcceptPeripheralLatency;     /**< Maximum acceptable Peripheral latency. */
-    bool                            autoReplyUpdateRequest;         /**< Set true to enable automatic reply when receiving BLE_L2CAP_EVT_CONN_PARA_UPDATE_REQ or BLE_GAP_EVT_REMOTE_CONN_PARAM_REQUEST. Otherwise set false. */
+    bool                            autoReplyUpdateRequest;         /**< Set true to enable automatic reply when receiving BLE_L2CAP_EVT_CONN_PARA_UPD_REQ or BLE_GAP_EVT_REMOTE_CONN_PARAM_REQUEST. Otherwise set false. */
 } BLE_DM_ConnConfig_T;
 
 /**@brief The structure contains information about configuration used for BLE_DM module. */
@@ -218,12 +229,14 @@ typedef struct BLE_DM_PairedDevInfo_T
 {
     BLE_GAP_Addr_T                  remoteAddr;                    /**< Paired device bluetooth address. */
     uint8_t                         remoteIrk[16];                 /**< Paired device BLE identity resolving key. */
+    BLE_GAP_Addr_T                  localAddr;                     /**< Local device bluetooth address. */
+    uint8_t                         localIrk[16];                  /**< Local device BLE identity resolving key. */
     uint8_t                         rv[8];                         /**< Paired device BLE rand value */
     uint8_t                         ediv[2];                       /**< Paired device BLE encrypted diversifier. */
     uint8_t                         ltk[16];                       /**< Paired device BLE Link key. */
-    uint8_t                         lesc:1;                        /**< Paired device using LE secure connection. */
-    uint8_t                         auth:1;                        /**< Paired device using authenticated pairing method. */
-    uint8_t                         encryptKeySize:6;              /**< Paired device BLE encrpytion key size */
+    unsigned int                    lesc:1;                        /**< Paired device using LE secure connection. */
+    unsigned int                    auth:1;                        /**< Paired device using authenticated pairing method. */
+    unsigned int                    encryptKeySize:6;              /**< Paired device BLE encrpytion key size. */
 }BLE_DM_PairedDevInfo_T;
 
 /**@brief The structure contains information about connection parameter update. */
@@ -251,8 +264,10 @@ typedef void (*BLE_DM_EventCb_T)(BLE_DM_Event_T *p_event);
  
 /**@brief Initialize BLE_DM module.
  *
+ * @retval true      Successfully initialize BLE_DM module.
+ * @retval false     Fail to initialize BLE_DM module.
 */
-void BLE_DM_Init();
+bool BLE_DM_Init(void);
 
 
 /**@brief Register BLE_DM callback.
@@ -268,7 +283,7 @@ uint16_t BLE_DM_EventRegister(BLE_DM_EventCb_T eventCb);
 
 
 /**@brief Handle BLE events.
- * @note  This API should be called in the application while caching BLE events
+ * @note  This API should be called in the application while caching BLE events.
  *
  * @param[in] p_stackEvent        Pointer to BLE events buffer.
 */
@@ -294,14 +309,14 @@ uint16_t BLE_DM_Config(BLE_DM_Config_T *p_config);
  *        It is up to the remote Central then to initiate pairing or encryption procedure.
  *
  * @param[in] connHandle    Connection handle associated with this connection.
- * @param[in] repairing     Whether to force a pairing procedure even if there is an existing
- *                          pairing record. This argument is only for the Central role.
+ * @param[in] repairing     Whether to force a pairing procedure even if there is an existing pairing record.
+ *                          This argument is only for the Central role. Set true to enable repairing, otherwise set false.
  *
  * @retval MBA_RES_SUCCESS      Successfully build configuration.
  * @retval MBA_RES_OOM          Internal memory allocation failure.
  * @retval MBA_RES_INVALID_PARA The connHandle is invalid.
 */
-uint16_t BLE_DM_ProceedSecurity(uint16_t connHandle, uint8_t repairing);
+uint16_t BLE_DM_ProceedSecurity(uint16_t connHandle, bool repairing);
 
 /**@brief Set filter accept list.
  * 
@@ -365,14 +380,13 @@ uint16_t BLE_DM_GetPairedDevice(uint8_t devId, BLE_DM_PairedDevInfo_T *p_pairedD
  * @retval MBA_RES_SUCCESS           Successfully deleted all paired device information.
  * @retval MBA_RES_FAIL              The delete operation failure.
 */
-uint16_t BLE_DM_DeleteAllPairedDevice();
+uint16_t BLE_DM_DeleteAllPairedDevice(void);
 
 /**@brief Get the paired device list of device IDs.
  *
  * @param[out] p_devId               Pointer to the device IDs list buffer. See @ref BLE_DM_MAX_PAIRED_DEVICE_NUM for the maximum size definition.
  * @param[out] p_devCnt              The number of valid device IDs in p_devId.
  *
- * @retval void
 */
 void BLE_DM_GetPairedDeviceList(uint8_t *p_devId, uint8_t *p_devCnt);
 
@@ -390,7 +404,15 @@ uint16_t BLE_DM_ConnectionParameterUpdate(uint16_t connHandle, BLE_DM_ConnParamU
 
 /**@} */ //BLE_DM_FUNS
 
+//DOM-IGNORE-BEGIN
+#ifdef __cplusplus
+}
 #endif
+//DOM-IGNORE-END
+
+#endif
+
+/** @} */
 
 /**
   @}

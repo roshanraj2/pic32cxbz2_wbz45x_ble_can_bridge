@@ -59,6 +59,8 @@
 
 //#define ENABLE_CONSOLE_PRINT
 
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -77,6 +79,7 @@ typedef struct CAN_MSG_t {
 }CAN_MSG_t;
 
 bool ramInitialized = false;
+
 
 // *****************************************************************************
 /* Application Data
@@ -321,8 +324,6 @@ void APP_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
-    
-    
 }
 
 

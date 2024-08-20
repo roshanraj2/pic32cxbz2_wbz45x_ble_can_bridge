@@ -59,6 +59,8 @@
 
 //#define ENABLE_CONSOLE_PRINT
 
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -77,6 +79,7 @@ typedef struct CAN_MSG_t {
 }CAN_MSG_t;
 
 bool ramInitialized = false;
+
 
 // *****************************************************************************
 /* Application Data
@@ -385,6 +388,7 @@ void APP_Tasks ( void )
         {
             if (OSAL_QUEUE_Receive(&appData.appQueue, &appMsg, OSAL_WAIT_FOREVER))
             {
+
                 if(p_appMsg->msgId==APP_MSG_BLE_STACK_EVT)
                 {
                     // Pass BLE Stack Event Message to User Application for handling

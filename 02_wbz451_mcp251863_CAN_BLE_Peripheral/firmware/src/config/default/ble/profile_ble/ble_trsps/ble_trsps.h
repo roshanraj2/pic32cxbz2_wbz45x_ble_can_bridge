@@ -37,9 +37,15 @@
     This file contains the BLE Transparent Server functions for application user.
  *******************************************************************************/
 
+/** @addtogroup BLE_PROFILE BLE Profile
+ *  @{ */
+
+/** @addtogroup BLE_TRP Transparent Profile
+ *  @{ */
 
 /**
- * @addtogroup BLE_TRPS
+ * @defgroup BLE_TRPS Transparent Profile Server Role (TRPS)
+ * @brief Transparent Profile Server Role (TRPS)
  * @{
  * @brief Header file for the BLE Transparent Profile library.
  * @note Definitions and prototypes for the BLE Transparent profile stack layer application programming interface.
@@ -55,6 +61,15 @@
 
 #include "stack_mgr.h"
 
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+extern "C" {
+
+#endif
+// DOM-IGNORE-END
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Macros
@@ -66,16 +81,16 @@
 /**@defgroup BLE_TRS_MAX_CONN_NBR Maximum connection number
  * @brief The definition of Memory size.
  * @{ */
-#define BLE_TRSPS_MAX_CONN_NBR                  BLE_GAP_MAX_LINK_NBR    /**< Maximum allowing Conncetion Numbers for MBADK. */
+#define BLE_TRSPS_MAX_CONN_NBR                  BLE_GAP_MAX_LINK_NBR    /**< Maximum allowing Conncetion Numbers for the device. */
 /** @} */
 
 /**@defgroup BLE_TRSPS_STATUS TRSPS Status
  * @brief The definition of BLE transparent service status.
  * @{ */
-#define BLE_TRSPS_STATUS_CTRL_DISABLED          0x00    /**< Local ble transparent service control characteristic CCCD is closed. */
-#define BLE_TRSPS_STATUS_CTRL_OPENED            0x01    /**< Local ble transparent service control characteristic CCCD is enable */
-#define BLE_TRSPS_STATUS_TX_DISABLED            0x00    /**< Local ble transparent service TX characteristic CCCD is closed. */
-#define BLE_TRSPS_STATUS_TX_OPENED              0x01    /**< Local ble transparent service TX characteristic CCCD is enable */
+#define BLE_TRSPS_STATUS_CTRL_DISABLED          (0x00U)    /**< Local ble transparent service control characteristic CCCD is closed. */
+#define BLE_TRSPS_STATUS_CTRL_OPENED            (0x01U)    /**< Local ble transparent service control characteristic CCCD is enable. */
+#define BLE_TRSPS_STATUS_TX_DISABLED            (0x00U)    /**< Local ble transparent service TX characteristic CCCD is closed. */
+#define BLE_TRSPS_STATUS_TX_OPENED              (0x01U)    /**< Local ble transparent service TX characteristic CCCD is enable. */
 /** @} */
 
 /**@} */ //BLE_TRPS_DEFINES
@@ -87,7 +102,7 @@
 /**@brief Enumeration type of BLE transparent profile callback events. */
 typedef enum BLE_TRSPS_EventId_T
 {
-    BLE_TRSPS_EVT_NULL = 0x00,
+    BLE_TRSPS_EVT_NULL = 0x00U,
     BLE_TRSPS_EVT_CTRL_STATUS,                          /**< Transparent Profile Control Channel status update event. See @ref BLE_TRSPS_EvtCtrlStatus_T for event details. */
     BLE_TRSPS_EVT_TX_STATUS,                            /**< Transparent Profile Data Channel transmit status event. See @ref BLE_TRSPS_EvtTxStatus_T for event details. */
     BLE_TRSPS_EVT_CBFC_ENABLED,                         /**< Transparent Profile Credit based flow control enable notification event. See @ref BLE_TRSPS_EvtCbfcEnabled_T for event details. */
@@ -156,7 +171,7 @@ typedef union
 /**@brief BLE Transparent profile server callback event. */
 typedef struct  BLE_TRSPS_Event_T
 {
-    uint8_t                   eventId;                        /**< Event ID.*/
+    BLE_TRSPS_EventId_T       eventId;                        /**< Event ID.*/
     BLE_TRSPS_EventField_T    eventField;                     /**< Event field. */
 } BLE_TRSPS_Event_T;
 
@@ -198,23 +213,15 @@ void BLE_TRSPS_EventRegister(BLE_TRSPS_EventCb_T bleTranServHandler);
  * @retval MBA_RES_OOM                  		No available memory. 
  *
  */
-uint16_t BLE_TRSPS_Init();
-
-
-/**@brief Change UUIDs of transparent service and characteristics.
- *
- * @param[in] p_bleTranServUuids            Pointer to the UUIDs see @ref BLE_TRSPS_Uuids_T.
- *
- */
-void BLE_TRSPS_ChangeUuids(BLE_TRSPS_Uuids_T *p_bleTranServUuids);
+uint16_t BLE_TRSPS_Init(void);
 
 
 /**@brief Send vendor command.
  *
  * @param[in] connHandle                    Connection handle associated with this connection.
- * @param[in] commandID                     Command id of the vendor command
- * @param[in] commandLength                 Length of payload in vendor commnad
- * @param[in] p_commandPayload              Pointer to the payload of vendor command
+ * @param[in] commandID                     Command id of the vendor command.
+ * @param[in] commandLength                 Length of payload in vendor commnad.
+ * @param[in] p_commandPayload              Pointer to the payload of vendor command.
  *
  * @retval MBA_RES_SUCCESS                  Successfully issue a send vendor command.
  * @retval MBA_RES_FAIL                     Invalid connection.
@@ -240,8 +247,8 @@ uint16_t BLE_TRSPS_SendData(uint16_t connHandle, uint16_t len, uint8_t *p_data);
 
 /**@brief Get queued data length.
  *
- * @param[in]    connHandle                 Connection handle associated with the queued data
- * @param[out]   p_dataLength               Pointer to the data length
+ * @param[in]    connHandle                 Connection handle associated with the queued data.
+ * @param[out]   p_dataLength               Pointer to the data length.
  *
  *
  */
@@ -250,8 +257,8 @@ void BLE_TRSPS_GetDataLength(uint16_t connHandle, uint16_t *p_dataLength);
 
 /**@brief Get queued data.
  *
- * @param[in] connHandle                    Connection handle associated with the queued data
- * @param[out] p_data                       Pointer to the data buffer
+ * @param[in] connHandle                    Connection handle associated with the queued data.
+ * @param[out] p_data                       Pointer to the data buffer.
  *
  * @retval MBA_RES_SUCCESS                  Successfully issue a flow ctrl stop.
  * @retval MBA_RES_FAIL                     No data in the input queue or can not find the link.
@@ -260,7 +267,7 @@ void BLE_TRSPS_GetDataLength(uint16_t connHandle, uint16_t *p_dataLength);
 uint16_t BLE_TRSPS_GetData(uint16_t connHandle, uint8_t *p_data);
 
 /**@brief Handle BLE_Stack events.
- *       This API should be called in the application while caching BLE_Stack events
+ *       This API should be called in the application while caching BLE_Stack events.
  *
  * @param[in] p_stackEvent        					Pointer to BLE_Stack events buffer.
  *
@@ -269,7 +276,18 @@ void BLE_TRSPS_BleEventHandler(STACK_Event_T *p_stackEvent);
 
 /**@} */ //BLE_TRPS_FUNS
 
+
+//DOM-IGNORE-BEGIN
+#ifdef __cplusplus
+}
 #endif
+//DOM-IGNORE-END
+
+#endif
+
+/** @} */
+
+/** @} */
 
 /**
   @}

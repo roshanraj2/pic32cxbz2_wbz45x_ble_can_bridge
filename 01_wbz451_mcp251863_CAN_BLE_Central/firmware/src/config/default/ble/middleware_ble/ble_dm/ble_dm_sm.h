@@ -51,6 +51,15 @@
 
 // *****************************************************************************
 // *****************************************************************************
+// Section: Included Files
+// *****************************************************************************
+// *****************************************************************************
+#include <stdint.h>
+#include <stdbool.h>
+#include "stack_mgr.h"
+
+// *****************************************************************************
+// *****************************************************************************
 // Section: Function Prototypes
 // *****************************************************************************
 // *****************************************************************************
@@ -59,9 +68,11 @@ void BLE_DM_Sm(STACK_Event_T *p_stackEvent);
 
 uint16_t BLE_DM_SmConfig(bool autoAccept);
 
-uint16_t BLE_DM_SmPairing(uint16_t connHandle, uint8_t repairing);
+uint16_t BLE_DM_SmPairing(uint16_t connHandle, bool repairing);
 
-void BLE_DM_SmInit();
+void BLE_DM_SmInit(void);
+
+void BLE_DM_SmWriteCompleteCallback(uint8_t devId);
 
 #endif
 
